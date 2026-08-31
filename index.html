@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="プラットフォームや状況に合わせたコメント返信文のドラフトを作成するツールです。">
+  <title>コメント返信文ドラフト作成ツール</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #D7E8E9;
+      --surface: #FFFFFF;
+      --text: #20363A;
+      --muted: #5C7A7D;
+      --accent: #2E7D74;
+      --accent-hover: #24645D;
+      --danger: #C0392B;
+      --border: #C3DCDC;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .page {
+      width: min(100% - 32px, 560px);
+      margin: 0 auto;
+      padding: 32px 0 40px;
+    }
+
+    .page-header { margin-bottom: 24px; }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .lead {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .tool {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .field + .field { margin-top: 24px; }
+
+    fieldset {
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    legend,
+    .field-label {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .choice {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      line-height: 1.35;
+    }
+
+    .choice:has(input:checked) {
+      border-color: var(--accent);
+      background: #EDF7F6;
+    }
+
+    .choice input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    textarea,
+    button {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font: inherit;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 112px;
+      padding: 12px;
+      resize: vertical;
+      background: var(--surface);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    textarea::placeholder { color: var(--muted); }
+
+    textarea[readonly] {
+      min-height: 168px;
+      overflow-wrap: anywhere;
+      background: #F9FCFC;
+    }
+
+    button {
+      min-height: 48px;
+      padding: 12px 16px;
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: var(--accent-hover); }
+    button:focus-visible,
+    textarea:focus-visible,
+    .choice:has(input:focus-visible) { outline: 3px solid #89BDB8; outline-offset: 2px; }
+
+    .message {
+      min-height: 22px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .message.error { color: var(--danger); }
+
+    @media (max-width: 375px) {
+      .page {
+        width: min(100% - 24px, 560px);
+        padding-top: 24px;
+      }
+
+      .tool { padding: 16px; }
+      .choices { gap: 8px; }
+      .choice { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <h1>コメント返信文ドラフト作成ツール</h1>
+      <p class="lead">状況に合う返信の型を作り、内容への言及を一言だけ差し込めます。</p>
+    </header>
+
+    <section class="tool" aria-label="返信文ドラフト作成フォーム">
+      <div class="field">
+        <fieldset>
+          <legend>プラットフォーム</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="platform" value="google" checked> Google口コミ</label>
+            <label class="choice"><input type="radio" name="platform" value="tabelog"> 食べログ</label>
+            <label class="choice"><input type="radio" name="platform" value="sns"> SNS</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="field">
+        <fieldset>
+          <legend>評価・感情の種類</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="sentiment" value="positive" checked> 好意的</label>
+            <label class="choice"><input type="radio" name="sentiment" value="neutral"> 中立</label>
+            <label class="choice"><input type="radio" name="sentiment" value="complaint"> 苦情</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="field">
+        <fieldset>
+          <legend>トーン</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="tone" value="polite" checked> 丁寧</label>
+            <label class="choice"><input type="radio" name="tone" value="casual"> カジュアル</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="mention">内容への言及</label>
+        <textarea id="mention" placeholder="例: お料理を褒めていただいた点"></textarea>
+      </div>
+
+      <div class="field">
+        <button type="button" id="generate">ドラフトを生成</button>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="result">生成結果</label>
+        <textarea id="result" readonly aria-describedby="copy-message" placeholder="ここに返信文のドラフトが表示されます"></textarea>
+      </div>
+
+      <div class="field">
+        <button type="button" id="copy">コピー</button>
+        <p class="message" id="copy-message" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const templates = {
+        google: {
+          positive: {
+            polite: 'このたびはご来店ならびに温かい口コミをお寄せいただき、誠にありがとうございます。{mention}とのお言葉をいただき、スタッフ一同大変うれしく拝見しました。これからも心地よい時間をお届けできるよう努めてまいります。',
+            casual: 'ご来店と嬉しい口コミをありがとうございます！{mention}と感じていただけて、とても励みになります。これからもまた来たいと思っていただけるお店を目指します。'
+          },
+          neutral: {
+            polite: 'このたびはご来店ならびにご感想をお寄せいただき、ありがとうございます。{mention}とのお声を真摯に受け止め、今後のサービス向上に活かしてまいります。またのご来店を心よりお待ちしております。',
+            casual: 'ご来店と率直なご感想をありがとうございます。{mention}とのお声を、これからのお店づくりに活かしていきます。またお立ち寄りいただけたら嬉しいです。'
+          },
+          complaint: {
+            polite: 'このたびはご来店いただいたにもかかわらず、ご期待に添えず申し訳ございませんでした。{mention}とのご指摘を重く受け止め、改善に努めてまいります。貴重なご意見をお寄せいただき、ありがとうございました。',
+            casual: 'せっかくお越しいただいたのに、ご期待に添えず申し訳ありません。{mention}とのご指摘をしっかり受け止め、改善していきます。お声を届けてくださり、ありがとうございます。'
+          }
+        },
+        tabelog: {
+          positive: {
+            polite: 'このたびはご利用ならびに高いご評価をいただき、誠にありがとうございます。{mention}とのお言葉を励みに、これからも丁寧なおもてなしを心がけてまいります。次回のご来店も心よりお待ちしております。',
+            casual: 'ご利用と素敵な評価をありがとうございます！{mention}と感じていただけて、とても嬉しいです。次回も気持ちよくお過ごしいただけるようお待ちしています。'
+          },
+          neutral: {
+            polite: 'このたびはご利用ならびにご投稿をいただき、ありがとうございます。{mention}とのご感想を大切に受け止め、よりご満足いただけるお店を目指してまいります。',
+            casual: 'ご利用とご感想をありがとうございます。{mention}とのお声を参考に、もっと楽しんでいただけるお店にしていきます。'
+          },
+          complaint: {
+            polite: 'このたびはご利用いただいたにもかかわらず、ご不快な思いをおかけし誠に申し訳ございません。{mention}とのご指摘を真摯に受け止め、サービスの見直しと改善を進めてまいります。貴重なご意見をありがとうございました。',
+            casual: 'ご利用いただいたのに、ご不快な思いをさせてしまい申し訳ありません。{mention}とのご指摘をきちんと受け止め、改善につなげます。率直なご意見をありがとうございます。'
+          }
+        },
+        sns: {
+          positive: {
+            polite: 'コメントをお寄せいただき、ありがとうございます。{mention}とのお言葉をいただけて、とても嬉しく思います。これからも楽しんでいただける発信・サービスをお届けします。',
+            casual: 'うれしいコメントをありがとうございます！{mention}って言ってもらえて、本当に励みになります。これからも楽しんでもらえるよう頑張ります！'
+          },
+          neutral: {
+            polite: 'コメントとご感想をありがとうございます。{mention}とのお声を参考に、これからの発信・サービスをより良くしてまいります。今後ともよろしくお願いいたします。',
+            casual: 'コメントありがとうございます！{mention}とのご意見、これからにしっかり活かします。これからも見てもらえたら嬉しいです。'
+          },
+          complaint: {
+            polite: 'コメントをお寄せいただき、ありがとうございます。ご不快な思いをおかけし、申し訳ございませんでした。{mention}とのご指摘を受け止め、今後の改善に努めてまいります。',
+            casual: 'コメントありがとうございます。不快な思いをさせてしまい、すみません。{mention}とのお声を受け止めて、これから改善していきます。'
+          }
+        }
+      };
+
+      const mention = document.querySelector('#mention');
+      const result = document.querySelector('#result');
+      const message = document.querySelector('#copy-message');
+
+      const selectedValue = (name) => document.querySelector(`input[name="${name}"]:checked`).value;
+
+      const makeDraft = () => {
+        const platform = selectedValue('platform');
+        const sentiment = selectedValue('sentiment');
+        const tone = selectedValue('tone');
+        const text = mention.value.trim() || '（内容への言及：未入力）';
+        result.value = templates[platform][sentiment][tone].replace('{mention}', () => text);
+        message.textContent = '';
+        message.className = 'message';
+      };
+
+      const selectForManualCopy = () => {
+        result.focus();
+        result.select();
+        result.setSelectionRange(0, result.value.length);
+        message.textContent = 'コピーできませんでした。手動で選択してコピーしてください。';
+        message.className = 'message error';
+      };
+
+      document.querySelector('#generate').addEventListener('click', makeDraft);
+
+      document.querySelector('#copy').addEventListener('click', async () => {
+        if (!result.value) makeDraft();
+        try {
+          if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard API is unavailable');
+          await navigator.clipboard.writeText(result.value);
+          message.textContent = 'コピーしました。';
+          message.className = 'message';
+        } catch (error) {
+          selectForManualCopy();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
